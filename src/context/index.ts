@@ -1,6 +1,7 @@
 import { lstatSync, readdirSync, readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { AuthenticationClient, ManagementClient } from 'auth0';
+import { ManagementClient as LegacyManagementClient } from 'auth0/legacy';
 import YAMLContext from './yaml';
 import DirectoryContext from './directory';
 
@@ -127,8 +128,7 @@ export const setupContext = async (
     });
     if (usedDeprecatedParams.length > 0) {
       log.warn(
-        `Usage of the ${usedDeprecatedParams.join(', ')} exclusion ${
-          usedDeprecatedParams.length > 1 ? 'params are' : 'param is'
+        `Usage of the ${usedDeprecatedParams.join(', ')} exclusion ${usedDeprecatedParams.length > 1 ? 'params are' : 'param is'
         } deprecated and may be removed from future major versions. See: https://github.com/auth0/auth0-deploy-cli/issues/451#user-content-deprecated-exclusion-props for details.`
       );
     }
@@ -138,10 +138,9 @@ export const setupContext = async (
     // Check if experimental early access features are enabled
     if (config.AUTH0_EXPERIMENTAL_EA) {
       log.warn(
-        `Experimental early access ${
-          EA_FEATURES.length === 1
-            ? 'feature [' + EA_FEATURES.join('') + '] is'
-            : 'features [' + EA_FEATURES.join(',') + '] are'
+        `Experimental early access ${EA_FEATURES.length === 1
+          ? 'feature [' + EA_FEATURES.join('') + '] is'
+          : 'features [' + EA_FEATURES.join(',') + '] are'
         } enabled. These are in a pre-release state and may change in future release.`
       );
     } else {
@@ -206,8 +205,25 @@ export const setupContext = async (
     headers: {
       'User-agent': `deploy-cli/${packageVersion} (node.js/${process.version.replace('v', '')})`,
     },
-    maxRetries: config.AUTH0_API_MAX_RETRIES || 10,
+    // maxRetries: config.AUTH0_API_MAX_RETRIES || 10,
+
   });
+
+  // Create legacy client for resources not yet available in v5 (e.g., userAttributeProfiles)
+  const legacyClient = new LegacyManagementClient({
+    domain: config.AUTH0_DOMAIN,
+    token: accessToken,
+    retry: {
+      maxRetries: config.AUTH0_API_MAX_RETRIES || 10,
+      enabled: true,
+    },
+    headers: {
+      'User-agent': `deploy-cli/${packageVersion} (node.js/${process.version.replace('v', '')})`,
+    },
+  });
+
+  // Attach legacy client to main client for handlers that need it
+  (mgmtClient as any).legacy = legacyClient;
 
   const inputFile = config.AUTH0_INPUT_FILE;
 
@@ -251,7 +267,7 @@ export const setupContext = async (
 
 export const filterOnlyIncludedResourceTypes =
   (includedAssetTypes: AssetTypes[] | undefined) =>
-  ([handlerName, _]: [AssetTypes, any]) => {
-    if (includedAssetTypes === undefined) return true;
-    return includedAssetTypes.includes(handlerName);
-  };
+    ([handlerName, _]: [AssetTypes, any]) => {
+      if (includedAssetTypes === undefined) return true;
+      return includedAssetTypes.includes(handlerName);
+    };

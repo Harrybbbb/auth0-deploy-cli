@@ -26,8 +26,9 @@ type customTextType = {
 
 type SsProfile = v4SsProfile;
 
-export type SsProfileWithCustomText = Omit<SsProfile, 'created_at' | 'updated_at'> & {
+export type SsProfileWithCustomText = Omit<SsProfile, 'created_at' | 'updated_at' | 'user_attributes'> & {
   customText?: customTextType;
+  user_attributes?: SsProfile['user_attributes'];
 };
 
 export const schema = {
@@ -344,7 +345,7 @@ export default class SelfServiceProfileHandler extends DefaultAPIHandler {
         (p) => p.user_attribute_profile_id && p.user_attribute_profile_id.trim() !== ''
       )
     ) {
-      return paginate<UserAttributeProfile>(this.client.userAttributeProfiles.list, {
+      return paginate<UserAttributeProfile>(this.client.legacy!.userAttributeProfiles.getAll, {
         checkpoint: true,
       });
     }

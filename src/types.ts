@@ -1,4 +1,5 @@
 import { Management, ManagementClient } from 'auth0';
+import { ManagementClient as LegacyManagementClient } from 'auth0/legacy';
 import { PromisePoolExecutor } from 'promise-pool-executor';
 import { Action } from './tools/auth0/handlers/actions';
 import { Prompts } from './tools/auth0/handlers/prompts';
@@ -46,6 +47,8 @@ export type ApiResponse = {
 
 export type Auth0APIClient = ManagementClient & {
   pool: PromisePoolExecutor;
+  // Legacy client for resources not yet available in v5
+  legacy?: LegacyManagementClient;
 };
 
 export type Config = {
@@ -93,10 +96,10 @@ export type Assets = Partial<{
   actions: Action[] | null;
   attackProtection: Asset | null;
   branding:
-    | (Asset & {
-        templates?: { template: string; body: string }[] | null;
-      })
-    | null;
+  | (Asset & {
+    templates?: { template: string; body: string }[] | null;
+  })
+  | null;
   phoneProviders: PhoneProvider[] | null;
   clients: Client[] | null;
   clientGrants: ClientGrant[] | null;
