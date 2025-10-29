@@ -1,4 +1,7 @@
 import { Management } from 'auth0';
+import {
+  SsProfile as v4SsProfile,
+} from 'auth0/legacy';
 import { isEmpty } from 'lodash';
 import { Asset, Assets, CalculatedChanges } from '../../../types';
 import log from '../../../logger';
@@ -21,7 +24,7 @@ type customTextType = {
   };
 };
 
-type SsProfile = Management.SelfServiceProfile;
+type SsProfile = v4SsProfile;
 
 export type SsProfileWithCustomText = Omit<SsProfile, 'created_at' | 'updated_at'> & {
   customText?: customTextType;

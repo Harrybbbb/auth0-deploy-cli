@@ -1,10 +1,12 @@
-import { Management } from 'auth0';
+import { UserAttributeProfile as v4UserAttributeProfile } from 'auth0/legacy';
 
 import DefaultAPIHandler, { order } from './default';
 import { Assets } from '../../../types';
 import log from '../../../logger';
 import { paginate } from '../client';
 import { calculateChanges } from '../../calculateChanges';
+
+export type UserAttributeProfile = v4UserAttributeProfile;
 
 const strategies = ['pingfederate', 'ad', 'adfs', 'waad', 'google-apps', 'okta', 'oidc', 'samlp'];
 const strategyOverrides = {
@@ -54,8 +56,6 @@ const strategyOverrides = {
     {}
   ),
 };
-
-export type UserAttributeProfile = Management.UserAttributeProfile;
 
 export const schema = {
   type: 'array',
@@ -212,7 +212,7 @@ export default class UserAttributeProfilesHandler extends DefaultAPIHandler {
     if (this.existing) return this.existing;
 
     try {
-      this.existing = await paginate<UserAttributeProfile>(this.client.userAttributeProfiles.list, {
+      this.existing = await paginate<UserAttributeProfile>(this.client.userAttributeProfiles.getAll, {
         checkpoint: true,
         include_totals: true,
         is_global: false,
