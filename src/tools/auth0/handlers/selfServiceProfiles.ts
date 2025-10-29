@@ -345,9 +345,12 @@ export default class SelfServiceProfileHandler extends DefaultAPIHandler {
         (p) => p.user_attribute_profile_id && p.user_attribute_profile_id.trim() !== ''
       )
     ) {
-      return paginate<UserAttributeProfile>(this.client.legacy!.userAttributeProfiles.getAll, {
-        checkpoint: true,
-      });
+      return paginate<UserAttributeProfile>(
+        this.client.legacy!.userAttributeProfiles.getAll.bind(this.client.legacy!.userAttributeProfiles),
+        {
+          checkpoint: true,
+        }
+      );
     }
 
     return [];

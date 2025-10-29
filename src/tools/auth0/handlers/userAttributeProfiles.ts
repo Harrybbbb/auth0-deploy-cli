@@ -213,7 +213,7 @@ export default class UserAttributeProfilesHandler extends DefaultAPIHandler {
 
     try {
       this.existing = await paginate<UserAttributeProfile>(
-        this.client.legacy!.userAttributeProfiles.getAll,
+        this.client.legacy!.userAttributeProfiles.getAll.bind(this.client.legacy!.userAttributeProfiles),
         {
           checkpoint: true,
           include_totals: true,

@@ -157,6 +157,11 @@ function pagePaginator(
 function pagedManager(client: Auth0APIClient, manager: Auth0APIClient) {
   return new Proxy<Auth0APIClient>(manager, {
     get: function (target: Auth0APIClient, name: string, receiver: unknown) {
+      // Don't wrap special properties that should not be proxied
+      if (name === 'legacy' || name === 'pool') {
+        return Reflect.get(target, name, receiver);
+      }
+
       if (name === 'list') {
         return async function (...args: [CheckpointPaginationParams | PagePaginationParams]) {
           switch (true) {
@@ -208,7 +213,14 @@ export async function paginate<T>(
   fetchFunc: (...paginateArgs: any) => any,
   args: PagePaginationParams | CheckpointPaginationParams
 ): Promise<T[]> {
-  // override default <T>.list() behaviour using pagedClient
-  const allItems = (await fetchFunc(args)) as unknown as T[];
-  return allItems;
+  // Call the fetch function
+  const result = await fetchFunc(args);
+  
+  // If the result has a 'data' property (legacy SDK ApiResponse), extract it
+  if (result && typeof result === 'object' && 'data' in result) {
+    return result.data as unknown as T[];
+  }
+  
+  // Otherwise, assume it's already the data (v5 SDK or pagedClient behavior)
+  return result as unknown as T[];
 }
