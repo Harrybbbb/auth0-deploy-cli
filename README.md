@@ -1,4 +1,4 @@
-![Deploy CLI Banner](https://cdn.auth0.com/website/sdks/banners/auth0-deploy-cli-banner.png)
+palash![Deploy CLI Banner](https://cdn.auth0.com/website/sdks/banners/auth0-deploy-cli-banner.png)
 
 [![npm version](https://badge.fury.io/js/auth0-deploy-cli.svg)](https://badge.fury.io/js/auth0-deploy-cli)
 [![CircleCI](https://circleci.com/gh/auth0/auth0-deploy-cli/tree/master.svg?style=svg)](https://circleci.com/gh/auth0/auth0-deploy-cli/tree/master)
